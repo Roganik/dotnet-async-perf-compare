@@ -18,15 +18,27 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    [HttpGet(template: "GetSync", Name = "GetWeatherForecastSync")]
+    public IEnumerable<WeatherForecast> GetSync()
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+        Thread.Sleep(100);
+
+        return GetForecast;
     }
+
+    [HttpGet(template: "GetAsync", Name = "GetWeatherForecastAsync")]
+    public async Task<WeatherForecast[]> GetAsync()
+    {
+        await Task.Delay(100);
+
+        return GetForecast;
+    }
+
+    private WeatherForecast[] GetForecast => Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        {
+            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            TemperatureC = Random.Shared.Next(-20, 55),
+            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+        })
+        .ToArray();
 }
